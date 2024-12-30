@@ -5,7 +5,10 @@ import (
 	"ProjectDB/internal/service"
 	"github.com/gin-gonic/gin"
 	"net/http"
+<<<<<<< HEAD
 	"strconv"
+=======
+>>>>>>> main
 )
 
 type MaterialHandler struct {
@@ -29,6 +32,7 @@ func (h *MaterialHandler) CreateMaterial(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Material created successfully"})
 }
 
+<<<<<<< HEAD
 func (h *MaterialHandler) GetFilteredMaterials(c *gin.Context) {
 	name := c.Query("name")
 	materialType := c.Query("type")
@@ -39,10 +43,15 @@ func (h *MaterialHandler) GetFilteredMaterials(c *gin.Context) {
 	}
 
 	materials, err := h.service.GetFilteredMaterials(name, materialType)
+=======
+func (h *MaterialHandler) GetAllMaterials(c *gin.Context) {
+	materials, err := h.service.GetAllMaterials()
+>>>>>>> main
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+<<<<<<< HEAD
 
 	c.JSON(http.StatusOK, materials)
 }
@@ -76,3 +85,7 @@ func (h *MaterialHandler) GetMaterialCountByType(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, materialCounts)
 }
+=======
+	c.JSON(http.StatusOK, materials)
+}
+>>>>>>> main

@@ -1,5 +1,6 @@
 package app
 
+<<<<<<< HEAD
 import "ProjectDB/internal/handler"
 
 func (a *App) setRoutersForEquipments(equipmentHandler *handler.EquipmentHandler) {
@@ -20,4 +21,8 @@ func (a *App) setRoutersForProductSpecifications(productSpecificationHandler *ha
 	a.Router.POST("/api/product-specification", productSpecificationHandler.CreateProductSpecification)
 	a.Router.GET("/api/product-specification/equipment/:id", productSpecificationHandler.GetSpecificationsByEquipment)
 	a.Router.PUT("/api/product-specification/:id", productSpecificationHandler.UpdateProductionDuration)
+=======
+func (a *App) initializeRoutes() {
+
+>>>>>>> main
 }

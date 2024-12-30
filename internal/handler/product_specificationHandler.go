@@ -5,7 +5,10 @@ import (
 	"ProjectDB/internal/service"
 	"github.com/gin-gonic/gin"
 	"net/http"
+<<<<<<< HEAD
 	"strconv"
+=======
+>>>>>>> main
 )
 
 type ProductSpecificationHandler struct {
@@ -29,6 +32,7 @@ func (h *ProductSpecificationHandler) CreateProductSpecification(c *gin.Context)
 	c.JSON(http.StatusOK, gin.H{"message": "Product specification created successfully"})
 }
 
+<<<<<<< HEAD
 func (h *ProductSpecificationHandler) GetSpecificationsByEquipment(c *gin.Context) {
 	equipmentIDStr := c.Param("equipment_id")
 	equipmentID, err := strconv.Atoi(equipmentIDStr)
@@ -38,10 +42,15 @@ func (h *ProductSpecificationHandler) GetSpecificationsByEquipment(c *gin.Contex
 	}
 
 	specs, err := h.service.GetSpecificationsByEquipment(equipmentID)
+=======
+func (h *ProductSpecificationHandler) GetAllProductSpecifications(c *gin.Context) {
+	specs, err := h.service.GetAllProductSpecifications()
+>>>>>>> main
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+<<<<<<< HEAD
 
 	c.JSON(http.StatusOK, specs)
 }
@@ -79,3 +88,7 @@ func (h *ProductSpecificationHandler) GetProductionCountByEquipment(c *gin.Conte
 	}
 	c.JSON(http.StatusOK, productionCounts)
 }
+=======
+	c.JSON(http.StatusOK, specs)
+}
+>>>>>>> main
