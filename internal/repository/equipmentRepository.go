@@ -3,14 +3,15 @@ package repository
 import (
 	"ProjectDB/config"
 	"ProjectDB/internal"
+	"fmt"
 )
 
 type EquipmentRepository interface {
 	CreateEquipment(equipment internal.Equipment) error
-	GetEquipmentByID(id int) (*internal.Equipment, error)
-	GetAllEquipment() ([]internal.Equipment, error)
-	UpdateEquipment(id int, equipment internal.Equipment) error
 	DeleteEquipment(id int) error
+	GetFilteredEquipment(name, manufacturer string) ([]internal.Equipment, error)
+	GetEquipmentWithMaterials() ([]map[string]interface{}, error)
+	UpdateEquipmentLifeTime(startDate string) error
 }
 
 type equipmentRepository struct {
@@ -27,21 +28,9 @@ func (r *equipmentRepository) CreateEquipment(equipment internal.Equipment) erro
 	return err
 }
 
-func (r *equipmentRepository) GetEquipmentByID(id int) (*internal.Equipment, error) {
-	query := `SELECT inventory_number, name, manufacturer, start_date, lifeTime FROM "MyDatabase".public.equipment WHERE inventory_number = $1`
-	row := r.session.DB.QueryRow(query, id)
-
-	var equipment internal.Equipment
-	err := row.Scan(&equipment.InventoryNumber, &equipment.Name, &equipment.Manufacturer, &equipment.StartDate, &equipment.LifeTime)
-	if err != nil {
-		return nil, err
-	}
-	return &equipment, nil
-}
-
-func (r *equipmentRepository) GetAllEquipment() ([]internal.Equipment, error) {
-	query := `SELECT inventory_number, name, manufacturer, start_date, lifeTime FROM "MyDatabase".public.equipment`
-	rows, err := r.session.DB.Query(query)
+func (r *equipmentRepository) GetFilteredEquipment(name, manufacturer string) ([]internal.Equipment, error) {
+	query := `SELECT * FROM "MyDatabase".public.equipment WHERE name LIKE $1 AND manufacturer = $2`
+	rows, err := r.session.DB.Query(query, name, manufacturer)
 	if err != nil {
 		return nil, err
 	}
@@ -50,8 +39,7 @@ func (r *equipmentRepository) GetAllEquipment() ([]internal.Equipment, error) {
 	var equipments []internal.Equipment
 	for rows.Next() {
 		var equipment internal.Equipment
-		err := rows.Scan(&equipment.InventoryNumber, &equipment.Name, &equipment.Manufacturer, &equipment.StartDate, &equipment.LifeTime)
-		if err != nil {
+		if err := rows.Scan(&equipment.InventoryNumber, &equipment.Name, &equipment.Manufacturer, &equipment.StartDate, &equipment.LifeTime); err != nil {
 			return nil, err
 		}
 		equipments = append(equipments, equipment)
@@ -59,14 +47,45 @@ func (r *equipmentRepository) GetAllEquipment() ([]internal.Equipment, error) {
 	return equipments, nil
 }
 
-func (r *equipmentRepository) UpdateEquipment(id int, equipment internal.Equipment) error {
-	query := `UPDATE "MyDatabase".public.equipment SET name = $1, manufacturer = $2, start_date = $3, lifeTime = $4 WHERE inventory_number = $5`
-	_, err := r.session.DB.Exec(query, equipment.Name, equipment.Manufacturer, equipment.StartDate, equipment.LifeTime, id)
+func (r *equipmentRepository) GetEquipmentWithMaterials() ([]map[string]interface{}, error) {
+	query := `
+		SELECT ps.name AS product_specification, e.name AS equipment, m.name AS material
+		FROM "MyDatabase".public.product_specification ps
+		JOIN "MyDatabase".public.equipment e ON ps.equipment_id = e.inventory_number
+		JOIN "MyDatabase".public.material m ON ps.material_id = m.material_id
+	`
+	rows, err := r.session.DB.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var results []map[string]interface{}
+	for rows.Next() {
+		var productSpec, equipment, material string
+		if err := rows.Scan(&productSpec, &equipment, &material); err != nil {
+			return nil, err
+		}
+		results = append(results, map[string]interface{}{
+			"product_specification": productSpec,
+			"equipment":             equipment,
+			"material":              material,
+		})
+	}
+	return results, nil
+}
+
+func (r *equipmentRepository) UpdateEquipmentLifeTime(startDate string) error {
+	query := `UPDATE "MyDatabase".public.equipment SET lifeTime = lifeTime + 5 WHERE start_date < $1`
+	_, err := r.session.DB.Exec(query, startDate)
 	return err
 }
 
 func (r *equipmentRepository) DeleteEquipment(id int) error {
 	query := `DELETE FROM "MyDatabase".public.equipment WHERE inventory_number = $1`
 	_, err := r.session.DB.Exec(query, id)
-	return err
+	if err != nil {
+		return fmt.Errorf("failed to delete equipment: %w", err)
+	}
+	return nil
 }
