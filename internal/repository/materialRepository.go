@@ -33,7 +33,7 @@ func (r *materialRepository) CreateMaterial(material internal.Material) error {
 }
 
 func (r *materialRepository) GetFilteredMaterials(name, materialType string) ([]internal.Material, error) {
-	query := `SELECT * FROM "MyDatabase".public.material WHERE name LIKE $1 AND type = $2`
+	query := `SELECT material_id, name, type, unit_price, unit_of_measurement, alternative FROM "MyDatabase".public.material WHERE name LIKE $1 AND type = $2`
 	rows, err := r.session.DB.Query(query, name, materialType)
 	if err != nil {
 		return nil, err
@@ -78,7 +78,7 @@ func (r *materialRepository) GetMaterialCountByType() (map[string]int, error) {
 }
 
 func (r *materialRepository) GetPaginatedMaterials(page, pageSize int) ([]internal.Material, error) {
-	query := `SELECT * FROM "MyDatabase".public.material ORDER BY material_id LIMIT $1 OFFSET $2`
+	query := `SELECT material_id, name, type, unit_price, unit_of_measurement, alternative FROM "MyDatabase".public.material ORDER BY material_id LIMIT $1 OFFSET $2`
 	offset := (page - 1) * pageSize
 
 	rows, err := r.session.DB.Query(query, pageSize, offset)
@@ -100,7 +100,7 @@ func (r *materialRepository) GetPaginatedMaterials(page, pageSize int) ([]intern
 
 func (r *materialRepository) SearchMaterialsByJSON(query string) ([]internal.Material, error) {
 	searchQuery := fmt.Sprintf(".*%s.*", query)
-	sqlQuery := `SELECT * FROM "MyDatabase".public.material WHERE metadata::text ~* $1`
+	sqlQuery := `SELECT material_id, name, type, unit_price, unit_of_measurement, alternative FROM "MyDatabase".public.material WHERE metadata::text ~* $1`
 
 	rows, err := r.session.DB.Query(sqlQuery, searchQuery)
 	if err != nil {
