@@ -89,3 +89,19 @@ func (h *MaterialHandler) GetPaginatedMaterials(c *gin.Context) {
 
 	c.JSON(http.StatusOK, materials)
 }
+
+func (h *MaterialHandler) SearchMaterials(c *gin.Context) {
+	query := c.Query("query")
+	if query == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Query parameter is required"})
+		return
+	}
+
+	materials, err := h.service.SearchMaterials(query)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, materials)
+}

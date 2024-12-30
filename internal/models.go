@@ -1,5 +1,7 @@
 package internal
 
+import "gorm.io/datatypes"
+
 type Equipment struct {
 	Name            string `json:"name"`
 	Manufacturer    string `json:"manufacturer"`
@@ -9,12 +11,13 @@ type Equipment struct {
 }
 
 type Material struct {
-	MaterialID        int     `json:"material_id"`
-	Name              string  `json:"name"`
-	Type              string  `json:"type"`
-	UnitPrice         float64 `json:"unit_price"`
-	UnitOfMeasurement string  `json:"unit_of_measurement"`
-	Alternative       string  `json:"alternative"`
+	MaterialID        int            `json:"material_id"`
+	Name              string         `json:"name"`
+	Type              string         `json:"type"`
+	UnitPrice         float64        `json:"unit_price"`
+	UnitOfMeasurement string         `json:"unit_of_measurement"`
+	Alternative       string         `json:"alternative"`
+	Metadata          datatypes.JSON `json:"metadata"`
 }
 
 type ProductSpecification struct {

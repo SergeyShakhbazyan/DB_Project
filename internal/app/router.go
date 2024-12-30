@@ -15,6 +15,8 @@ func (a *App) setRoutersForMaterials(materialHandler *handler.MaterialHandler) {
 	a.Router.GET("/api/material", materialHandler.GetFilteredMaterials)
 	a.Router.PUT("/api/material/update-price", materialHandler.UpdateMaterialPrice)
 	a.Router.GET("/api/materials", materialHandler.GetPaginatedMaterials)
+	a.Router.GET("/api/materials/search", materialHandler.SearchMaterials)
+
 }
 
 func (a *App) setRoutersForProductSpecifications(productSpecificationHandler *handler.ProductSpecificationHandler) {

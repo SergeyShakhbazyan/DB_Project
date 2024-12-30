@@ -25,3 +25,12 @@ CREATE TABLE product_specification (
     FOREIGN KEY (equipment_id) REFERENCES equipment (inventory_number) ON DELETE CASCADE,
     FOREIGN KEY (material_id) REFERENCES material (material_id) ON DELETE CASCADE
 );
+
+ALTER TABLE material ADD COLUMN metadata JSONB;
+
+UPDATE material SET metadata = '{"density": 7850, "uses": ["construction", "manufacturing"]}' WHERE name = 'Steel';
+UPDATE material SET metadata = '{"density": 8940, "uses": ["electronics", "wiring"]}' WHERE name = 'Copper';
+
+CREATE INDEX idx_metadata_gin ON material USING gin (metadata jsonb_path_ops);
+
+SELECT * FROM material WHERE metadata::text ~* '.*"uses":.*"construction".*';

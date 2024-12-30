@@ -12,6 +12,7 @@ type MaterialService interface {
 	UpdateMaterialPrice(percentage float64) error
 	GetMaterialCountByType() (map[string]int, error)
 	GetPaginatedMaterials(page, pageSize int) ([]internal.Material, error)
+	SearchMaterials(query string) ([]internal.Material, error)
 }
 
 type materialService struct {
@@ -43,4 +44,11 @@ func (s *materialService) GetMaterialCountByType() (map[string]int, error) {
 
 func (s *materialService) GetPaginatedMaterials(page, pageSize int) ([]internal.Material, error) {
 	return s.repo.GetPaginatedMaterials(page, pageSize)
+}
+
+func (s *materialService) SearchMaterials(query string) ([]internal.Material, error) {
+	if query == "" {
+		return nil, fmt.Errorf("query parameter cannot be empty")
+	}
+	return s.repo.SearchMaterialsByJSON(query)
 }
