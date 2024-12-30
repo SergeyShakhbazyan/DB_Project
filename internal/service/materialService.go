@@ -11,6 +11,7 @@ type MaterialService interface {
 	GetFilteredMaterials(name, materialType string) ([]internal.Material, error)
 	UpdateMaterialPrice(percentage float64) error
 	GetMaterialCountByType() (map[string]int, error)
+	GetPaginatedMaterials(page, pageSize int) ([]internal.Material, error)
 }
 
 type materialService struct {
@@ -38,4 +39,8 @@ func (s *materialService) UpdateMaterialPrice(percentage float64) error {
 
 func (s *materialService) GetMaterialCountByType() (map[string]int, error) {
 	return s.repo.GetMaterialCountByType()
+}
+
+func (s *materialService) GetPaginatedMaterials(page, pageSize int) ([]internal.Material, error) {
+	return s.repo.GetPaginatedMaterials(page, pageSize)
 }

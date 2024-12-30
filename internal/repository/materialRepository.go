@@ -11,6 +11,7 @@ type MaterialRepository interface {
 	GetFilteredMaterials(name, materialType string) ([]internal.Material, error)
 	UpdateMaterialPrice(percentage float64) error
 	GetMaterialCountByType() (map[string]int, error)
+	GetPaginatedMaterials(page, pageSize int) ([]internal.Material, error)
 }
 
 type materialRepository struct {
@@ -73,4 +74,25 @@ func (r *materialRepository) GetMaterialCountByType() (map[string]int, error) {
 		materialCounts[materialType] = count
 	}
 	return materialCounts, nil
+}
+
+func (r *materialRepository) GetPaginatedMaterials(page, pageSize int) ([]internal.Material, error) {
+	query := `SELECT * FROM "MyDatabase".public.material ORDER BY material_id LIMIT $1 OFFSET $2`
+	offset := (page - 1) * pageSize
+
+	rows, err := r.session.DB.Query(query, pageSize, offset)
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute pagination query: %w", err)
+	}
+	defer rows.Close()
+
+	var materials []internal.Material
+	for rows.Next() {
+		var material internal.Material
+		if err := rows.Scan(&material.MaterialID, &material.Name, &material.Type, &material.UnitPrice, &material.UnitOfMeasurement, &material.Alternative); err != nil {
+			return nil, fmt.Errorf("failed to scan row: %w", err)
+		}
+		materials = append(materials, material)
+	}
+	return materials, nil
 }

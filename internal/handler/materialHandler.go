@@ -76,3 +76,16 @@ func (h *MaterialHandler) GetMaterialCountByType(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, materialCounts)
 }
+
+func (h *MaterialHandler) GetPaginatedMaterials(c *gin.Context) {
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "10"))
+
+	materials, err := h.service.GetPaginatedMaterials(page, pageSize)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, materials)
+}

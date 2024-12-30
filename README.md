@@ -80,4 +80,3 @@ To utilize these routes, ensure your API client is configured with the proper ba
 ### Notes
 - Replace `:id` in routes with the actual ID of the resource you wish to interact with.
 - Ensure proper validation and authentication as per your system’s requirements before accessing these endpoints.
-
